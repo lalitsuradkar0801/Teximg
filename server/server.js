@@ -9,26 +9,35 @@ import imageRouter from './routes/imageRoutes.js'
 const PORT = process.env.PORT || 4000
 const app = express()
 
-// ✅ FIX 2: specify frontend origin
+// CORS Configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173'
+  origin: [
+    'http://localhost:5173',
+    'https://teximg-lovat.vercel.app'
+  ],
+  credentials: true
 }))
 
 app.use(express.json())
 
-// ✅ FIX 1: wrap everything in async startServer function
 const startServer = async () => {
   try {
-    await connectDB() // ✅ now safely awaited inside async function
+    await connectDB()
 
     app.use('/api/user', userRouter)
     app.use('/api/image', imageRouter)
-    app.get('/', (req, res) => res.send("API Working"))
 
-    app.listen(PORT, () => console.log('Server running on port ' + PORT)) // ✅ FIX 3: added space
+    app.get('/', (req, res) => {
+      res.send('API Working')
+    })
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`)
+    })
+
   } catch (error) {
     console.error('Failed to connect to DB:', error)
-    process.exit(1) // ✅ exit if DB fails to connect
+    process.exit(1)
   }
 }
 
